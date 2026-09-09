@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Danh sách hóa đơn - InvoiceFlow{% endblock %}
+{% block content %}
+<h1>Danh sách hóa đơn</h1>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+{% if invoices %}
+<table class="invoice-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên file gốc</th>
+            <th>Tải lên lúc</th>
+            <th>Trạng thái</th>
+            <th>Rà soát</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inv in invoices %}
+        <tr>
+            <td><a href="/invoices/{{ inv['id'] }}">#{{ inv['id'] }}</a></td>
+            <td>{{ inv["original_filename"] }}</td>
+            <td>{{ inv["uploaded_at"] }}</td>
+            <td><span class="badge badge-{{ inv['status'] }}">{{ status_label(inv["status"]) }}</span></td>
+            <td>
+                {% if needs_review(inv["review_reasons"]) %}
+                <span class="badge badge-needs_attention">Cần rà soát</span>
+                {% else %}
+                <span class="hint">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="hint">Chưa có hóa đơn nào. <a href="/upload">Tải hóa đơn đầu tiên lên</a>.</p>
+{% endif %}
+{% endblock %}

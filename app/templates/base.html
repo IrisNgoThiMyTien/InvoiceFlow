@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}InvoiceFlow{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css?v={{ asset_version() }}">
+</head>
+<body>
+    <header class="topbar">
+        <a href="/invoices" class="brand">InvoiceFlow</a>
+        <nav>
+            <a href="/upload">Tải hóa đơn lên</a>
+            <a href="/invoices">Danh sách hóa đơn</a>
+        </nav>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

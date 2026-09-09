@@ -1,0 +1,28 @@
+{
+  "invoice_type_name": {"value": "Hóa đơn giá trị gia tăng", "confidence": 0.9},
+  "invoice_form_number": {"value": "01GTKT0/001", "confidence": 0.9},
+  "invoice_number": {"value": "INV-DEMO-001", "confidence": 0.95},
+  "invoice_date": {"value": "2026-08-20", "confidence": 0.9},
+  "seller_name": {"value": "Công ty TNHH Ví Dụ Demo", "confidence": 0.88},
+  "seller_tax_code": {"value": "0312345678", "confidence": 0.9},
+  "buyer_name": {"value": null, "confidence": null},
+  "buyer_tax_code": {"value": null, "confidence": null},
+  "buyer_company_name": {"value": "Công ty TNHH Khách Hàng Demo", "confidence": 0.85},
+  "buyer_address": {"value": null, "confidence": null},
+  "buyer_bank_account": {"value": null, "confidence": null},
+  "buyer_payment_method": {"value": "Tiền mặt", "confidence": 0.7},
+  "subtotal": {"value": 1000000, "confidence": 0.85},
+  "tax_amount": {"value": 100000, "confidence": 0.85},
+  "total_amount": {"value": 1100000, "confidence": 0.8},
+  "currency": {"value": "VND", "confidence": 0.99},
+  "line_items": [
+    {
+      "description": "Dịch vụ tư vấn (demo)",
+      "quantity": 1,
+      "unit_price": 1000000,
+      "line_total": 1000000,
+      "confidence": 0.8
+    }
+  ],
+  "review_reasons": ["buyer_name_not_found", "buyer_tax_code_not_found"]
+}

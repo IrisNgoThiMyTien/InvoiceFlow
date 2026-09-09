@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Hóa đơn #{{ invoice["id"] }} - InvoiceFlow{% endblock %}
+{% block content %}
+<h1>Hóa đơn #{{ invoice["id"] }}</h1>
+<p>
+    Trạng thái: <span class="badge badge-{{ invoice['status'] }}">{{ status_label }}</span>
+    &nbsp;|&nbsp; Tên file gốc: {{ invoice["original_filename"] }}
+    &nbsp;|&nbsp; Tải lên lúc: {{ invoice["uploaded_at"] }}
+    {% if invoice["ocr_provider"] %}
+    &nbsp;|&nbsp; Chế độ OCR:
+    <span class="badge badge-ocr-{{ invoice['ocr_provider'] }}">
+        {% if invoice["ocr_provider"] == "groq" %}Real (Groq){% else %}Demo (mẫu tĩnh){% endif %}
+    </span>
+    {% endif %}
+</p>
+
+{% if save_error %}
+<div class="alert alert-error">{{ save_error }}</div>
+{% endif %}
+
+{% if needs_review %}
+<div class="alert alert-warning">
+    <strong>Cần rà soát:</strong>
+    <ul>
+        {% for label in review_reason_labels %}
+        <li>{{ label }}</li>
+        {% endfor %}
+    </ul>
+    <p class="hint" style="margin:4px 0 8px;">
+        Các trường có viền vàng bên dưới là trường OCR không đọc được — vui lòng
+        nhập tay rồi bấm "Xác nhận lưu".
+    </p>
+    <form action="/invoices/{{ invoice['id'] }}/retry-ocr" method="post" style="margin-top:4px;">
+        <button type="submit">Chạy lại OCR</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="review-layout">
+    <div class="review-image">
+        <img src="/uploads/{{ invoice['stored_filename'] }}" alt="Ảnh hóa đơn #{{ invoice['id'] }}">
+    </div>
+    <div class="review-form">
+        <h2>Dữ liệu hóa đơn</h2>
+        <form action="/invoices/{{ invoice['id'] }}/save" method="post">
+            <table class="field-table">
+                <tbody>
+                    {% for field_name, field_label, is_money in header_fields %}
+                    <tr>
+                        <th><label for="f_{{ field_name }}">{{ field_label }}</label></th>
+                        <td>
+                            <input
+                                type="text"
+                                {% if is_money %}inputmode="decimal"{% endif %}
+                                id="f_{{ field_name }}"
+                                name="{{ field_name }}"
+                                value="{{ format_number(invoice[field_name]) if is_money else (invoice[field_name] if invoice[field_name] is not none else '') }}"
+                                class="field-input {% if field_name in missing_fields %}field-input-missing{% endif %}"
+                                placeholder="{% if field_name in missing_fields %}Chưa xác định - nhập tay{% endif %}"
+                            >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h3>Dòng hàng / dịch vụ</h3>
+            <div class="line-items-grid">
+                <div class="grid-header">Tên hàng hoá/ dịch vụ</div>
+                <div class="grid-header">SL</div>
+                <div class="grid-header">Đơn giá</div>
+                <div class="grid-header">Thành tiền</div>
+                <div class="grid-header"></div>
+                <div id="line-items-body" style="display: contents;">
+                    {% for item in line_items %}
+                    <div class="line-item-row" style="display: contents;">
+                        <div><input type="text" name="line_description" value="{{ item['description'] or '' }}" class="field-input field-input-desc"></div>
+                        <div><input type="text" inputmode="decimal" name="line_quantity" value="{{ format_number(item['quantity']) }}" class="field-input field-input-qty"></div>
+                        <div><input type="text" inputmode="decimal" name="line_unit_price" value="{{ format_number(item['unit_price']) }}" class="field-input field-input-narrow"></div>
+                        <div><input type="text" inputmode="decimal" name="line_total" value="{{ format_number(item['line_total']) }}" class="field-input field-input-narrow"></div>
+                        <div><button type="button" class="btn-remove-row" onclick="this.closest('.line-item-row').remove()">Xóa</button></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="button" id="add-line-btn">+ Thêm dòng</button>
+
+            <p class="hint" style="margin-top:16px;">
+                Sửa trực tiếp các trường bên trên (đặc biệt các trường viền vàng OCR
+                chưa đọc được), sau đó bấm "Xác nhận lưu" để lưu chính thức.
+            </p>
+            <button type="submit" class="btn-primary">Xác nhận lưu</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById("add-line-btn").addEventListener("click", () => {
+    const body = document.getElementById("line-items-body");
+    const row = document.createElement("div");
+    row.className = "line-item-row";
+    row.style.display = "contents";
+    row.innerHTML = `
+        <div><input type="text" name="line_description" class="field-input field-input-desc"></div>
+        <div><input type="text" inputmode="decimal" name="line_quantity" class="field-input field-input-qty"></div>
+        <div><input type="text" inputmode="decimal" name="line_unit_price" class="field-input field-input-narrow"></div>
+        <div><input type="text" inputmode="decimal" name="line_total" class="field-input field-input-narrow"></div>
+        <div><button type="button" class="btn-remove-row" onclick="this.closest('.line-item-row').remove()">Xóa</button></div>
+    `;
+    body.appendChild(row);
+});
+</script>
+{% endblock %}

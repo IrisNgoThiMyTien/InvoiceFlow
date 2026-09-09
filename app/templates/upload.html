@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Tải hóa đơn lên - InvoiceFlow{% endblock %}
+{% block content %}
+<h1>Tải ảnh hóa đơn lên</h1>
+<p class="hint">Chấp nhận file JPG hoặc PNG, tối đa vài MB. Ảnh sẽ được lưu an toàn trên máy chủ.</p>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+    <input type="file" name="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
+    <button type="submit">Tải lên</button>
+</form>
+{% endblock %}
